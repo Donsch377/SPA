@@ -1,14 +1,145 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <title>CS 1030 Web Page Project</title>
-    <!-- Replace the content in the following line with your name. -->
-    <meta name="author" content="REPLACE WITH YOUR NAME">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Splitter</title>
+    <meta name="author" content="Donald Schell" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Replace the lines in this body with your content. -->
-    <h1>CS 1030 - Web page Project</h1>
-    <img src="logo.png">
-    <p>Did I change?</p>
-    <p><a href="secondpage.html">More</a></p>
+    <header class="app-header">
+      <h1>Expense Splitter</h1>
+      <div class="actions">
+        <button id="undoBtn" title="Undo last change (no shortcut)">Undo</button>
+        <button id="redoBtn" title="Redo change">Redo</button>
+        <button id="exportBtn" title="Export current session to JSON">Export</button>
+        <label class="import-label">
+          <input type="file" id="importFile" accept="application/json" />
+          Import
+        </label>
+      </div>
+    </header>
+
+    <main class="grid">
+      <!-- People -->
+      <section class="card" id="peopleCard">
+        <h2>People</h2>
+        <div class="row">
+          <input id="personName" type="text" placeholder="Add a person (e.g., Alice)" />
+          <button id="addPersonBtn">Add</button>
+        </div>
+        <ul id="peopleList" class="pill-list" aria-live="polite"></ul>
+      </section>
+
+      <!-- Expense -->
+      <section class="card" id="expenseCard">
+        <h2>Add Expense</h2>
+        <div class="form-grid">
+          <label>
+            <span>Description</span>
+            <input id="expDesc" type="text" placeholder="Dinner, Gas, Tickets…" />
+          </label>
+          <label>
+            <span>Amount ($)</span>
+            <input id="expAmount" type="number" step="0.01" min="0" placeholder="0.00" />
+          </label>
+          <label>
+            <span>Payer</span>
+            <select id="expPayer"></select>
+          </label>
+          <fieldset class="participants">
+            <legend>Participants</legend>
+            <div id="participantsBox" class="check-grid"><!-- checkboxes injected --></div>
+            <div class="split-row">
+              <label class="radio"><input type="radio" name="splitMode" value="equal" checked /> Equal</label>
+              <label class="radio"><input type="radio" name="splitMode" value="custom" /> Custom shares (%)</label>
+            </div>
+            <div id="customShares" class="custom-shares hidden"><!-- inputs injected --></div>
+          </fieldset>
+          <fieldset class="taxTip">
+            <legend>Tax/Tip (per expense)</legend>
+            <div class="row">
+              <label>
+                <span>Tax %</span>
+                <input id="expTaxPct" type="number" step="0.01" min="0" placeholder="0" />
+              </label>
+              <label>
+                <span>Tip %</span>
+                <input id="expTipPct" type="number" step="0.01" min="0" placeholder="0" />
+              </label>
+              <label class="radio"><input type="radio" name="surchargeMode" value="percent" checked /> Use %</label>
+              <label class="radio"><input type="radio" name="surchargeMode" value="fixed" /> Or fixed $</label>
+            </div>
+            <div class="row" id="fixedRow" hidden>
+              <label>
+                <span>Tax $</span>
+                <input id="expTaxFixed" type="number" step="0.01" min="0" placeholder="0.00" />
+              </label>
+              <label>
+                <span>Tip $</span>
+                <input id="expTipFixed" type="number" step="0.01" min="0" placeholder="0.00" />
+              </label>
+            </div>
+          </fieldset>
+          <div class="row">
+            <button id="addExpenseBtn">Add Expense</button>
+            <button id="clearFormBtn" class="secondary">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Expense List -->
+      <section class="card" id="listCard">
+        <h2>Expenses</h2>
+        <table id="expenseTable">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Payer</th>
+              <th>Participants</th>
+              <th>Total $</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <!-- Results -->
+      <section class="card" id="resultsCard">
+        <h2>Results</h2>
+        <div class="row end">
+          <button id="computeBtn">Compute Settlements</button>
+          <button id="copySettlementBtn" class="secondary">Copy Settlement</button>
+        </div>
+        <div class="results-grid">
+          <div>
+            <h3>Balances</h3>
+            <table id="balancesTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Paid $</th>
+                  <th>Owes $</th>
+                  <th>Net $</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div>
+            <h3>Who pays who</h3>
+            <ol id="settlementList"></ol>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <small>Desktop-first • Vanilla JS/CSS/HTML • No persistence</small>
+    </footer>
+
+    <script src="code.js"></script>
   </body>
 </html>
