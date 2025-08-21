@@ -532,3 +532,145 @@
   }
   init();
 })();
+
+
+// =============================
+// Advanced Engine (Itemized & Payments) — no UI
+// Purpose: handle complicated transactions (per-item ownership, per-person tips, partial payments)
+// This exposes a tiny API under window.AdvancedSplitter for future UIs/tests.
+// =============================
+(function(){
+  "use strict";
+  const A = {};
+
+  // Internal model
+  const model = {
+    people: [], // ["Donald","Adam","Joe"]
+    items: [],  // {id, desc, price, participants:[name], mode:'equal'|'custom', shares:{name:pct}}
+    tips: {},   // { name: { percent?: number, fixed?: number } }
+    payments: [] // [{ name, amount }]
+  };
+
+  // Helpers
+  const isNum = (n)=> typeof n === 'number' && isFinite(n);
+  const round2 = (x)=> Math.round((x + Number.EPSILON)*100)/100;
+
+  // Public API
+  A.setPeople = function(list){
+    model.people = Array.from(new Set(list.filter(Boolean)));
+    // normalize tips for all people
+    model.people.forEach(p=>{ if(!model.tips[p]) model.tips[p] = { }; });
+    return A;
+  };
+
+  A.addItem = function({desc="(item)", price=0, participants=[], mode='equal', shares={}}){
+    if(!isNum(price) || price <= 0) throw new Error("Item price must be > 0");
+    const parts = participants.filter(p=> model.people.includes(p));
+    if(parts.length === 0) throw new Error("Item must have at least one participant");
+
+    // Sudoku-like inference: if mode custom and exactly one participant is missing a share, infer the remainder to 100
+    if(mode === 'custom'){
+      const names = parts;
+      const provided = names.filter(n=> isNum(shares[n]));
+      const sum = provided.reduce((a,n)=> a + (shares[n]||0), 0);
+      const missing = names.filter(n=> !isNum(shares[n]));
+      if(missing.length === 1){
+        shares[missing[0]] = Math.max(0, 100 - sum);
+      }
+      const final = names.reduce((a,n)=> a + (shares[n]||0), 0);
+      // If not 100, we still proceed but proportionally normalize (auto-fill behavior)
+      if(final > 0 && Math.abs(final - 100) > 0.001){
+        names.forEach(n=> { shares[n] = (shares[n]||0) * 100 / final; });
+      }
+    }
+    const id = Math.random().toString(36).slice(2,10);
+    model.items.push({ id, desc, price, participants: parts, mode, shares: {...shares} });
+    return id;
+  };
+
+  A.setTip = function(name, { percent, fixed }){
+    if(!model.people.includes(name)) throw new Error("Unknown person: "+name);
+    model.tips[name] = { percent: isNum(percent)? percent : undefined, fixed: isNum(fixed)? fixed : undefined };
+    return A;
+  };
+
+  A.addPayment = function({ name, amount }){
+    if(!model.people.includes(name)) throw new Error("Unknown payer: "+name);
+    if(!isNum(amount) || amount <= 0) throw new Error("Payment must be > 0");
+    model.payments.push({ name, amount });
+    return A;
+  };
+
+  A.clear = function(){
+    model.people = []; model.items = []; model.tips = {}; model.payments = [];
+    return A;
+  };
+
+  // Compute breakdown
+  A.compute = function(){
+    const people = model.people;
+    const subtotal = Object.fromEntries(people.map(p=> [p,0]));
+
+    // Distribute items
+    for(const it of model.items){
+      if(it.mode === 'equal'){
+        const share = it.price / it.participants.length;
+        it.participants.forEach(p=> { subtotal[p] += share; });
+      } else {
+        // custom % over the item price
+        const names = it.participants;
+        const sumPct = names.reduce((a,n)=> a + (it.shares[n]||0), 0) || 100;
+        names.forEach(n=> {
+          const pct = (it.shares[n]||0) / sumPct; // normalized if needed
+          subtotal[n] += it.price * pct;
+        });
+      }
+    }
+
+    // Per-person tips
+    const tipVal = Object.fromEntries(people.map(p=> [p,0]));
+    for(const p of people){
+      const t = model.tips[p] || {};
+      const percent = isNum(t.percent) ? t.percent : undefined;
+      const fixed = isNum(t.fixed) ? t.fixed : undefined;
+      if(isNum(fixed)) tipVal[p] += fixed;
+      if(isNum(percent)) tipVal[p] += (percent/100) * subtotal[p];
+    }
+
+    // Payments
+    const paid = Object.fromEntries(people.map(p=> [p,0]));
+    for(const pay of model.payments){ paid[pay.name] += pay.amount; }
+
+    // Net = paid - (subtotal + tip)
+    const net = Object.fromEntries(people.map(p=> [p, round2(paid[p] - (subtotal[p] + tipVal[p])) ]));
+
+    // Settlement greedy (creditors first)
+    const creditors = people.filter(p=> net[p] > 0).map(p=> ({ name:p, amt: net[p] }));
+    const debtors   = people.filter(p=> net[p] < 0).map(p=> ({ name:p, amt: -net[p] }));
+    const settlements = [];
+    let ci=0, di=0;
+    while(ci < creditors.length && di < debtors.length){
+      const c = creditors[ci];
+      const d = debtors[di];
+      const pay = Math.min(c.amt, d.amt);
+      if(pay > 0.0000001){
+        settlements.push({ from: d.name, to: c.name, amount: round2(pay) });
+        c.amt = round2(c.amt - pay);
+        d.amt = round2(d.amt - pay);
+      }
+      if(c.amt <= 0.0000001) ci++;
+      if(d.amt <= 0.0000001) di++;
+    }
+
+    return {
+      subtotal: Object.fromEntries(people.map(p=> [p, round2(subtotal[p])])),
+      tip: tipVal,
+      paid,
+      net,
+      settlements
+    };
+  };
+
+  // Expose
+  window.AdvancedSplitter = A;
+})();
