@@ -120,7 +120,7 @@ async function generatePath(distanceMeters, coords) {
 
   // Draw + store
   const geo = { type: 'LineString', coordinates: allCoords };
-  routeLine = L.geoJSON(geo, { style: { color: 'cyan' } }).addTo(map);
+  routeLine = L.geoJSON(geo, { style: { color: 'blue' } }).addTo(map);
   map.fitBounds(routeLine.getBounds());
   currentRouteCoords = allCoords;
 }
