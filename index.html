@@ -5,40 +5,37 @@
 </head>
 <body>
   <h1>Expense Splitter</h1>
-  <form action="/action_page.php">
-    <label for="name">First name:</label><br>
-    <input type="text" id="name" name="name" value="John"><br>
-    <input type="submit" value="Submit">
-  </form> 
-  <table>
-  <tr>
-    <th></th>
-    <th>Cost</th>
-    <th>Tip?</th>
-    <th>Payed to bill</th>
-  </tr>
-  <tr>
-    <td>Joe</td>
-    <td>14</td>
-    <td>5</td>
-    <td>21</td>
-  </tr>
-  <tr>
-    <td>Adam</td>
-    <td>10</td>
-    <td>2</td>
-    <td>12</td>
-  </tr>
-  <tr>
-    <td>Don</td>
-    <td>4</td>
-    <td>1</td>
-    <td>3</td>
-  </tr>
-</table>
+  <div class="set-form">
+  <script src="code.js"></script>
+  <table id="myTable" class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Cost</th>
+        <th>Payed</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr>
+        <td>
+          <textarea name="Name" placeholder="Name" th:field="${questionAnswerSet.name}" id="name" style="resize: none; width: 100%;"></textarea>
+        </td>
+        <td>
+          <textarea name="Cost" placeholder="Cost" th:field="${questionAnswerSet.cost}" id="cost" style="resize: none; width: 100%;"></textarea>
+        </td>
+        <td>
+          <textarea name="Payed" placeholder="Payed" th:field="${questionAnswerSet.payed}" id="payed" style="resize: none; width: 100%;"></textarea>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="set-form">
+    <input type="button" id="more_fields" onclick="add_fields();" value="Add More" class="btn btn-info" />
+  </div>
 <h2>Summary</h2>
-<h3>Joe Payed</h3>
-<h3>Adam Payed</h3>
-<h3>Don owes Joe $2</h3>
+<input type="button" id="generate_summary" onclick="getTextAreasString();" value="Generate Summary" />
+  <div id="summaryList">
+
+  </div>
 </body>
 </html>
