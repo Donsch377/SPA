@@ -1,42 +1,136 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>HTML Tutorial</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sudoku Split – Receipt-first Cash Splitter (MVP)</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Expense Splitter</h1>
-  <h2><a href="https://github.com/Donsch377/SPA">Github Page</a></h2>
-  <div class="set-form">
-  <script src="code.js"></script>
-  <table id="myTable" class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Cost</th>
-        <th>Payed</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody">
-      <tr>
-        <td>
-          <textarea name="Name" placeholder="Name" th:field="${questionAnswerSet.name}" id="name" style="resize: none; width: 100%;"></textarea>
-        </td>
-        <td>
-          <textarea name="Cost" placeholder="Cost" th:field="${questionAnswerSet.cost}" id="cost" style="resize: none; width: 100%;"></textarea>
-        </td>
-        <td>
-          <textarea name="Payed" placeholder="Payed" th:field="${questionAnswerSet.payed}" id="payed" style="resize: none; width: 100%;"></textarea>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div class="set-form">
-    <input type="button" id="more_fields" onclick="add_fields();" value="Add More" class="btn btn-info" />
-  </div>
-<h2>Summary</h2>
-<input type="button" id="generate_summary" onclick="getTextAreasString();" value="Generate Summary" />
-  <div id="summaryList">
+  <header>
+    <h1>Sudoku Split</h1>
+    <p class="subtitle">Receipt-first splitter. Fill what you know — it solves the rest.</p>
+  </header>
 
-  </div>
+  <main>
+    <!-- PEOPLE -->
+    <section id="peopleSection" class="card">
+      <div class="card-header">
+        <h2>1) People</h2>
+        <button id="addPersonBtn" class="btn">+ Add Person</button>
+      </div>
+      <div class="table-wrap">
+        <table id="peopleTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Tip %</th>
+              <th>Tip Basis</th>
+              <th>Cash Now</th>
+              <th>Is Payer?</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="peopleTbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ITEMS (RECEIPT) -->
+    <section id="itemsSection" class="card">
+      <div class="card-header">
+        <h2>2) Receipt Items</h2>
+        <div class="inline-actions">
+          <button id="addItemBtn" class="btn">+ Add Item</button>
+          <label class="checkbox-inline"><input type="checkbox" id="defaultTaxable" checked> New items taxable by default</label>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="itemsTable">
+          <thead>
+            <tr>
+              <th>Desc</th>
+              <th>Price (pre-tax)</th>
+              <th>Taxable?</th>
+              <th>Owners (equal split if multiple)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="itemsTbody"></tbody>
+        </table>
+      </div>
+      <p class="hint">Tip: Select multiple owners to split an item evenly. Use the toggle to mark non-taxable items.</p>
+    </section>
+
+    <!-- TAXES & FEES -->
+    <section id="chargesSection" class="card">
+      <div class="card-header">
+        <h2>3) Taxes & Fees</h2>
+        <button id="addChargeBtn" class="btn">+ Add Tax / Fee / Discount</button>
+      </div>
+      <div class="table-wrap">
+        <table id="chargesTable">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Label</th>
+              <th>Amount</th>
+              <th class="options-col">Options</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="chargesTbody"></tbody>
+        </table>
+      </div>
+      <ul class="hint-list">
+        <li><strong>Tax</strong>: amount from the receipt bottom line. Allocated by inferring rate from taxable items.</li>
+        <li><strong>Fee</strong>: positive amount; by default allocated proportional to base. Check “Split evenly” to divide equally.</li>
+        <li><strong>Discount</strong>: enter as negative amount; allocation follows the same rule as fees.</li>
+      </ul>
+    </section>
+
+    <!-- SETTINGS / MODE -->
+    <section id="modeSection" class="card">
+      <h2>4) Pay Mode</h2>
+      <label class="checkbox-inline">
+        <input type="checkbox" id="cashOnlyToggle"> Cash-only (no cards at the counter)
+      </label>
+      <p class="hint">If cash is short in cash-only mode, we’ll tell the payer how much to withdraw.</p>
+    </section>
+
+    <!-- ACTIONS -->
+    <section id="actionsSection" class="card">
+      <button id="computeBtn" class="btn primary">Compute Split</button>
+      <button id="resetBtn" class="btn subtle">Reset</button>
+      <span id="computeStatus" class="status"></span>
+    </section>
+
+    <!-- SUMMARY -->
+    <section id="summarySection" class="card">
+      <h2>Summary</h2>
+      <div id="reconWarnings" class="warnings"></div>
+
+      <div class="grid two">
+        <div>
+          <h3>Per-Person Breakdown</h3>
+          <div id="personBreakdown"></div>
+        </div>
+        <div>
+          <h3>At the Counter</h3>
+          <div id="counterGuidance"></div>
+          <h3>Final Settlement</h3>
+          <div id="settlement"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Made for AiCode Class • MVP math engine: proportional tax/fees, per-person tips, cash-mode.
+    </small>
+  </footer>
+
+  <script src="code.js"></script>
 </body>
 </html>

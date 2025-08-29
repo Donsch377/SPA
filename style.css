@@ -1,0 +1,69 @@
+
+
+:root{
+  --bg:#0b0d10; --card:#141821; --muted:#8fa3b0; --text:#e8eef2;
+  --accent:#5aa9e6; --accent-2:#6ee7b7; --danger:#ef6f6c; --warn:#f7c948;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;}
+
+/* Header */
+header{padding:20px 20px 0}
+header h1{margin:0;font-size:28px}
+.subtitle{margin:6px 0 0;color:var(--muted)}
+
+/* Layout cards */
+main{padding:20px;max-width:1100px;margin:0 auto}
+.card{background:var(--card);border:1px solid #1f2430;border-radius:12px;padding:16px;margin:16px 0;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+
+/* Tables */
+.table-wrap{overflow:auto;border-radius:8px;border:1px solid #233}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:720px}
+th,td{padding:10px 12px;border-bottom:1px solid #233;text-align:left;vertical-align:top}
+th{position:sticky;top:0;background:#18202a;font-weight:600;z-index:1}
+tr:last-child td{border-bottom:none}
+
+/***** Controls *****/
+.btn{background:#1f2632;color:var(--text);border:1px solid #2a3342;border-radius:8px;padding:8px 12px;cursor:pointer;transition:border-color .15s,transform .03s ease}
+.btn:hover{border-color:#3b4a63}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);color:#071018;border-color:var(--accent)}
+.btn.subtle{background:transparent;border-color:#2a3342}
+.remove-btn{background:transparent;border-color:#3a2a2a;color:#f3b1b1}
+.remove-btn:hover{border-color:#ef6f6c}
+.inline-actions{display:flex;gap:10px;align-items:center}
+.checkbox-inline{margin-left:10px;color:var(--muted);font-size:14px;white-space:nowrap}
+
+/* Inputs */
+input[type="text"], input[type="number"], select{width:100%;background:#0f131a;border:1px solid #2a3342;color:var(--text);border-radius:8px;padding:8px}
+input[type="number"]{appearance:textfield}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button{appearance:none;margin:0}
+input[type="checkbox"]{transform:translateY(1px)}
+
+/* Hints & misc */
+.hint{color:var(--muted);font-size:13px;margin-top:8px}
+.hint-list{color:var(--muted);font-size:13px;margin:8px 0 0 18px}
+.hint-list li{margin:4px 0}
+.status{margin-left:12px;color:var(--muted)}
+.options-col{width:360px}
+
+/* Badges, lists */
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#202738;color:var(--text);margin:2px 4px 0 0;font-size:12px}
+.small{font-size:12px;color:var(--muted)}
+.list{margin:0;padding:0;list-style:none}
+.list li{margin:6px 0;padding:8px;border:1px solid #263141;border-radius:8px;background:#10151d}
+.total-row{font-weight:700}
+
+/* Grid */
+.grid.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width: 900px){ .grid.two{grid-template-columns:1fr} }
+
+/* States / messaging */
+.warnings{color:var(--warn);margin-bottom:10px}
+.bad{color:var(--danger)}
+.good{color:var(--accent-2)}
+
+/* Footer */
+footer{padding:24px;text-align:center;color:var(--muted)}
